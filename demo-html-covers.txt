@@ -1,0 +1,24 @@
+<style>
+#new-books-wrapper {
+	width:100%;
+	height:100px;
+	overflow:hidden;
+        margin-bottom:42px;
+
+}
+#new-books {
+	width:120%
+}
+.new-book-cover:hover {
+        opacity:.6;
+
+}
+
+</style>
+
+<script src="https://www.bc.edu/content/dam/bc1/schools/law/js/library/newacq/scripts/tabletop.js"></script>
+<script src="https://www.bc.edu/content/dam/bc1/schools/law/js/library/newacq/scripts/tabletop-new-books-covers.js"></script>
+
+<div id="new-books-wrapper">
+<div id="new-books"></div>
+</div>

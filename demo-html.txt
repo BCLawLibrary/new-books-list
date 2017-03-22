@@ -1,0 +1,8 @@
+<link rel="stylesheet" type="text/css" href="https://www.bc.edu/content/dam/bc1/schools/law/js/library/newacq/css/new-books.css" />
+<script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.12/datatables.min.js"></script>
+<script src="https://www.bc.edu/content/dam/bc1/schools/law/js/library/newacq/scripts/tabletop.js"></script>
+<script src="https://www.bc.edu/content/dam/bc1/schools/law/js/library/newacq/scripts/tabletop-feed-newacq.js"></script>
+
+<div id="months"><div class="monthList"></ul></div>
+
+<div id="listData"><ul class="mylist"></ul></div>
