@@ -1,23 +1,27 @@
 .int-wrap.school-wrap .bulk-wrap>main .showsidenav {
-	padding-bottom:20px; 
-	
+	padding-bottom:20px;
+
+}
+
+#pagecontent #months .btn.btn-default, #pagecontent #months .btn {
+	width:auto;
 }
 
 #months {
-	padding:10px 15px 15px;
+	padding:10px 15px 15px;g
 	background-color:#eee;
-	
+
 }
 
 
 #months span.btn-maroon {
-	margin-right:20px;
+	margin-right:20px;a
 	margin-bottom:10px;
 }
 
 #months span.highlight-issue {
 	background-color:#BC9B6B;
-	
+
 }
 #months span.highlight-issue a:hover {
 	color:#8A100B;
@@ -57,12 +61,12 @@
 	right:5px;
 }
 a.subjectLink:focus, a.subjectLink:hover, a.all:focus, a.all:hover {
-	
-} 
+
+}
 
 .dataTables_filter input {
 	margin-left:5px;
-	
+
 }
 
 #newacq table.dataTable th {
@@ -72,7 +76,7 @@ a.subjectLink:focus, a.subjectLink:hover, a.all:focus, a.all:hover {
 #newacq table.dataTable, #newacq table.dataTable td {
 	border:0px solid black;
 	background-color:transparent;
-	
+
 }
 #newacq tr {
 	min-height:116px;
@@ -80,7 +84,7 @@ a.subjectLink:focus, a.subjectLink:hover, a.all:focus, a.all:hover {
 
 td.image {
 	width:150px;
-	
+
 }
 
 #newacq tr.group {
@@ -103,7 +107,3 @@ td.image {
 	column-count: 2;
 	}
 }
-
-
-
-
