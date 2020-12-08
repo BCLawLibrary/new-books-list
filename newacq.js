@@ -286,7 +286,8 @@ function createMenu() {
 		'bInfo': false,
 		'dom' : 'tr',
     'ajax' : {
-      url:'https://sheets.googleapis.com/v4/spreadsheets/1Ym_DjK2JNfwv5HeTvF8wVtmOg-TXQZKwzEJg5gJunuA/values/A:M?key=AIzaSyD8Y28YJpVhE4XlVlOoA74Ws47YdPz5nGA',
+			url:'https://sheets.googleapis.com/v4/spreadsheets/1Ym_DjK2JNfwv5HeTvF8wVtmOg-TXQZKwzEJg5gJunuA/values/A:M?key=AIzaSyD8Y28YJpVhE4XlVlOoA74Ws47YdPz5nGA',
+			cache: true,
       'dataSrc': function(json) {
         var myData = json['values']; //spreadsheet data lives in an array with the name values
         //rewrite data to an object with key-value pairs. This is also a chance to rename or ignore columns
