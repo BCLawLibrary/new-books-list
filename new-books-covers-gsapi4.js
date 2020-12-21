@@ -22,8 +22,7 @@ function writeCovers(dataSource) {
 $(document).ready(function(){
   //load the data from the Google Sheet
   $.ajax({
-    url: "https://sheets.googleapis.com/v4/spreadsheets/1Ym_DjK2JNfwv5HeTvF8wVtmOg-TXQZKwzEJg5gJunuA/values/A:M?key=AIzaSyD8Y28YJpVhE4XlVlOoA74Ws47YdPz5nGA",
-    cache: false
+    url: "https://sheets.googleapis.com/v4/spreadsheets/1Ym_DjK2JNfwv5HeTvF8wVtmOg-TXQZKwzEJg5gJunuA/values/A:M?key=AIzaSyD8Y28YJpVhE4XlVlOoA74Ws47YdPz5nGA"
   })
   .done(function( json ) {
     var myData = json['values']; //spreadsheet data lives in an array with the name values
