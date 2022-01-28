@@ -16,8 +16,7 @@
 
 </style>
 
-<script src="https://www.bc.edu/content/dam/bc1/schools/law/js/library/newacq/scripts/tabletop.js"></script>
-<script src="https://www.bc.edu/content/dam/bc1/schools/law/js/library/newacq/scripts/tabletop-new-books-covers.js"></script>
+<script src="https://www.bc.edu/content/dam/bc1/schools/law/js/library/newacq/scripts/new-books-covers-gsapi4.js"></script>
 
 <div id="new-books-wrapper">
 <div id="new-books"></div>
