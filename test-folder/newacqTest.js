@@ -296,7 +296,7 @@ function createMenu() {
 
     var oTable = $('#data-table-container').DataTable({
 
-
+// ajax is returning an error that I believe means there's an issue with the Sheets API
 		'sPaginationType': 'bootstrap',
 		'bPaginate': false,
 		'bInfo': false,
