@@ -3,4 +3,4 @@ This widget displays a searchable list of new books from a Google Sheet. Books a
 
 A separate widget displays cover images from books marked as featured, with links to catalog records.
 
-Relies on jQuery, Datatables (https://datatables.net/) and Google Sheets API V4 (https://developers.google.com/sheets/api). 
+This application pulls CSV data from public Google Sheets maintained by the BC Law Library, then parses it using [Papa Parse](https://www.papaparse.com/) into JSON. The data is then displayed using [DataTables](https://datatables.net/) and jQuery.

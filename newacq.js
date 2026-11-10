@@ -5,352 +5,240 @@ function getURLParameter(name) {
 mycategory = getURLParameter('category');
 myaudience = getURLParameter('audience');
 
+async function fetchCSVData(url) {
+  /* Takes Google Sheets URL and returns an object.
+     Object.data is an array of objects, 
+     in which each object is a line on the spreadsheet. */
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error("Failed to fetch CSV");
+    return Papa.parse(await response.text(), { header: true });
+  } catch (error) {
+    console.error(error);
+	console.log("Error fetching CSV data. Please check the URL or your internet connection.");
+    return { data: [] }; // Return empty object in case of error
+  }
+}
+
 // begin main function
 $(document).ready(function(){
 
-// create table headers
-function createTableColumns(){
+	var collapsedGroups = {};
 
-    var tableColumns =   [
-		{'data': 'image', 'title': 'Image', 'className':'image' },
-		{'data': 'cite', 'title': 'Cite', 'sWidth':'360px', 'className':'cite preLoad' },
-		{'data': 'subject', 'title': 'Subject', 'className':'Subject', 'visible':false },
-		{'data': 'month', 'title': 'Month', 'visible':false },
-		{'data': 'issue', 'title': 'Issue', 'visible':false }
+	function applyGroupToggleState(table) {
+		table.find('tr.group').each(function () {
+			var groupKey = $(this).data('group');
+			var isCollapsed = collapsedGroups[groupKey] === true;
+			var toggle = $(this).find('.group-toggle');
+			toggle.find('.group-toggle-icon').text(isCollapsed ? '▸' : '▾');
+			toggle.attr('aria-expanded', String(!isCollapsed));
 
-	];
-    return tableColumns;
-}
-
-//function that runs on init to creat the menu
-function createMenu() {
-	//Create Issue List
-	var issueList=
-    oTable
-        .columns( 3, {order:'index'} )
-        .data()
-        .eq( 0 )      // Reduce the 2D array into a 1D array of data
-		.unique();     // Reduce to unique values
-
-	var mList = $('div.monthList')
-	$.each(issueList, function(i)
-
-		{
-			var span = $('<span/>')
-				.addClass('ui-menu-item btn btn-maroon btn-default')
-				.attr('role', 'menuitem')
-				.appendTo(mList);
-			var aaa = $('<a/>')
-				.addClass('issueLink')
-				.text(issueList[i])
-				.attr('href','#')
-				.appendTo(span);
+			table.find('tr.group-item').filter(function () {
+				return $(this).data('group') === groupKey;
+			}).toggle(!isCollapsed);
 		});
 
-	$(".monthList span a:first, .monthList span:first").addClass("highlight-issue");
-
-	//Filter to current issue
-	var currentIssue = oTable
-		.column(4)
-		.data()
-		.sort(function(a, b){return a-b})
-		.reverse()[0];
-
-	oTable
-				.columns(4)
-				.search(currentIssue)
-				.draw();
-
-	var subjectList=
-    oTable
-        .columns( 2, {search:'applied'} )
-        .data()
-        .eq( 0 )      // Reduce the 2D array into a 1D array of data
-        .sort()       // Sort data alphabetically
-        .unique();     // Reduce to unique values
-
-	var cList = $('ul.mylist')
-	$.each(subjectList, function(i)//create subject menu
-		{
-			var li = $('<li/>')
-				.addClass('ui-menu-item')
-				.attr('role', 'menuitem')
-				.appendTo(cList);
-			var aaa = $('<a/>')
-				.addClass('subjectLink')
-				.text(subjectList[i])
-				.attr('href','#')
-				.appendTo(li);
+		var groupRows = table.find('tr.group');
+		var allCollapsed = groupRows.length > 0 && groupRows.toArray().every(function (groupRow) {
+			return collapsedGroups[$(groupRow).data('group')] === true;
 		});
-	var li = $('<li/>') //add Show All link at end of subject menu
-				.addClass('all')
-				.attr('role', 'menuitem')
-				.appendTo(cList);
-	var aaa = $('<a/>')
-				.addClass('all')
-				.text('Show all items in this issue')
-				.attr('href','#')
-				.appendTo(li);
-
-
-	if (mycategory.length >0) {
-	var highlightclass="li#"+mycategory;
-	 $ (highlightclass).addClass ("highlight-subject");
-	 oTable.fnFilter(mycategory, 2);
-	}
-	else {$(".all").addClass ("highlight-subject").parent('li').addClass('highlight-li');}
-
-	if (myaudience.length >0) {
-	var highlightclass="li."+myaudience;
-	 $ (highlightclass).addClass ("highlight-audience");
-	 oTable.fnFilter(myaudience, 3);
+		$('#toggle-all-groups')
+			.attr('aria-expanded', String(!allCollapsed));
 	}
 
+	// create table headers
+	function createTableColumns(){
 
+		var allTableColumns = [
+			{'title': 'Title', 'visible': false, 'searchable': false},
+			{'title': 'Feature', 'visible': false, 'searchable': false},
+			{'title': 'Subject', 'className': 'Subject', 'visible': false}, // 2
+			{'title': 'Call Number', 'visible': false, 'searchable': false},
+			{'title': 'Author', 'visible': false, 'searchable': false},
+			{'title': 'Alma ID', 'visible': false, 'searchable': false},
+			{'title': 'ISBN', 'visible': false, 'searchable': false},
+			{'title': 'EbookURL', 'visible': false, 'searchable': false},
+			{'title': 'Month', 'visible': false}, // 8
+			{'title': 'Issue', 'visible': false},
+			{'title': 'Link', 'visible': false, 'searchable': false},
+			{'title': 'Image', 'className': 'image'},
+			{'title': 'Cite', 'sWidth': '450px', 'className': 'cite preLoad'}, // 12
+			{'HD_Image': 'HD_Image', 'visible': false, 'searchable': false},
+			{'title': 'Summary', 'sWidth': '360px', 'className': 'summary'}
+		];
+		
+		return allTableColumns;
+	}
 
+	//function that runs on init to creat the menu
+	function createMenu(oTable) {
+		//Create Issue List
+		var monthList = oTable
+			.columns( 8, {order:'index'} )
+			.data()
+			.eq( 0 )      // Reduce the 2D array into a 1D array of data
+			.unique();     // Reduce to unique values
 
-	$("ul.category li.filter")
-		.click(function(event){
-			event.preventDefault();
-			$ (".highlight-category").removeClass ("highlight-category");
-			mycategory=$(this).attr("id");
-			var highlightclass="li#"+mycategory;
-			$ (highlightclass)
-				.addClass ("highlight-category");
+		
+		var mList = $('div.monthList')
 
+		var showAll = $('<span/>')
+			.addClass('ui-menu-item btn btn-maroon btn-default')
+			.attr('role', 'menuitem')
+			.appendTo(mList);
+		
+			$('<a/>')
+			.addClass('allMonthsLink')
+			.text('Show All')
+			.attr('href', '#')
+			.appendTo(showAll);
 
-			oTable.fnFilter(mycategory, 2);
+		$.each(monthList, function(i){
+				var span = $('<span/>')
+					.addClass('ui-menu-item btn btn-maroon btn-default')
+					.attr('role', 'menuitem')
+					.appendTo(mList);
+				var aaa = $('<a/>')
+					.addClass('monthLink')
+					.text(monthList[i])
+					.attr('href','#')
+					.appendTo(span);
+			}
+		);
 
-		});
+		$('<button/>')
+			.attr({
+				'id': 'toggle-all-groups',
+				'type': 'button',
+				'aria-expanded': 'true'
+			})
+			.addClass('btn btn-default all-groups-toggle')
+			.text('Collapse/Expand')
+			.insertBefore('#newacq')
+			.on('click', function () {
+				var groupRows = $('#data-table-container').find('tr.group');
+				var allCollapsed = groupRows.length > 0 && groupRows.toArray().every(function (groupRow) {
+				return collapsedGroups[$(groupRow).data('group')] === true;
+				});
 
+				groupRows.each(function () {
+				collapsedGroups[$(this).data('group')] = !allCollapsed;
+				});
+				applyGroupToggleState($('#data-table-container'));
+			});
 
-
-
-	$("a.issueLink")
-		.click(function(event){
-			event.preventDefault();
-			$(".prev").slideUp();
-			myissue=$(this).text();
-			$ (".highlight-issue").removeClass ("highlight-issue");
-			$ (this)
-				.addClass ("highlight-issue")
-				.parent()
-				.addClass ("highlight-issue");
+		function filterByMonth(month) {
+			$('.highlight-issue').removeClass('highlight-issue');
+			if (month) {
+				$('a.monthLink').filter(function () {
+					return $(this).text() === month;
+				}).addClass('highlight-issue').parent().addClass('highlight-issue');
+			} else {
+				$('a.allMonthsLink').addClass('highlight-issue').parent().addClass('highlight-issue');
+			}
 
 			oTable
 				.columns()
-				.search("")
-				.columns(3)
-				.search(myissue)
+				.search('')
+				.columns(8)
+				.search(month || '')
 				.draw();
-			var subjectList=
-			oTable
-				.columns( 2, {search:'applied'} )
-				.data()
-				.eq( 0 )      // Reduce the 2D array into a 1D array of data
-				.sort()       // Sort data alphabetically
-				.unique();     // Reduce to unique values
+		}
 
-			$('ul.mylist').html("");
-			var cList = $('ul.mylist')
+		$("a.monthLink")
+			.click(function (event) {
+				event.preventDefault();
+				$(".prev").slideUp();
+				filterByMonth($(this).text());
+			});
 
-			$.each(subjectList, function(i)
-				{
-					var li = $('<li/>')
-						.addClass('ui-menu-item')
-						.attr('role', 'menuitem')
-						.appendTo(cList);
-					var aaa = $('<a/>')
-						.addClass('subjectLink')
-						.text(subjectList[i])
-						.attr('href','#')
-						.appendTo(li);
-				});
+		$("a.allMonthsLink")
+			.click(function (event) {
+				event.preventDefault();
+				$(".prev").slideUp();
+				filterByMonth('');
+			});
 
-			var li = $('<li/>') //add Show All link at end of subject menu
-				.addClass('all')
-				.attr('role', 'menuitem')
-				.appendTo(cList);
-			var aaa = $('<a/>')
-				.addClass('all')
-				.text('Show all items in this issue')
-				.attr('href','#')
-				.appendTo(li);
-
-		$("a.subjectLink")
-		.click(function(event){
-			event.preventDefault();
-			mycategory=$(this).text();
-			$ (".highlight-subject").removeClass("highlight-subject");
-			$ (".highlight-li").removeClass("highlight-li");
-			$ (this)
-				.addClass ("highlight-subject")
-				.parent('li')
-				.addClass('highlight-li');
-
-			oTable
-				.columns(2)
-				.search(mycategory)
-				.draw();
+		var latestMonth = monthList[0];
+		$.each(monthList, function (i, month) {
+			var monthDate = Date.parse(month);
+			var latestDate = Date.parse(latestMonth);
+			if (!isNaN(monthDate) && (isNaN(latestDate) || monthDate > latestDate)) {
+				latestMonth = month;
+			}
 		});
-		$("li.all")
-		.click(function(event){
-			event.preventDefault();
-			$ (".highlight-subject").removeClass ("highlight-subject");
-			$ (".highlight-li").removeClass("highlight-li");
-			mycategory=$(this).attr("class");
-			var highlightclass="a."+mycategory;
-			$ (highlightclass)
-				.addClass ("highlight-subject")
-				.parent('li')
-				.addClass('highlight-li');
+		filterByMonth(latestMonth);
 
-
-
-			oTable
-				.columns(2)
-				.search("")
-				.draw();
-
-
-
-
-
-		});
-		});
-
-		$("a.subjectLink")
-		.click(function(event){
-			event.preventDefault();
-			mycategory=$(this).text();
-			$ (".highlight-subject").removeClass("highlight-subject");
-			$ (".highlight-li").removeClass("highlight-li");
-			$ (this)
-				.addClass ("highlight-subject")
-				.parent('li')
-				.addClass('highlight-li');
-
-			oTable
-				.columns(2)
-				.search(mycategory)
-				.draw();
-
-
-		});
-
-
-
-
-
-	$("li.all")
-		.click(function(event){
-			event.preventDefault();
-			$ (".highlight-subject").removeClass ("highlight-subject");
-			$ (".highlight-li").removeClass("highlight-li");
-			mycategory=$(this).attr("class");
-			var highlightclass="a."+mycategory;
-			$ (highlightclass)
-				.addClass ("highlight-subject")
-				.parent('li')
-				.addClass('highlight-li');
-
-
-			oTable
-				.columns(2)
-				.search("")
-				.draw();
-
-
-		});
-
-	$("a.prevLink")
-		.click(function() {
+		$("a.prevLink")
+		.click(function () {
 			$(".rss").slideUp();
 			$(".prev").slideToggle();
 
 		});
-}
+	}
 
-// create the table container and object
-
-
-
-
+	// create the table container and object
     $('#newacq').html('<table cellpadding="0" cellspacing="0" border="0" class="display table" id="data-table-container" style="width:100%"></table>');
 
-    var oTable = $('#data-table-container').DataTable({
+	const acqURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwQMJVT6cctJMbqY2OF4c4dRH2AFnCNJ-mTL1h3zjeJj7D3rw2Te1qvTgyNH0fAe_RYZhkL3j7oMuA/pub?gid=0&single=true&output=csv';
+	
+	async function main(acqURL) {
+		const acqData = await fetchCSVData(acqURL);
+		
+		var data = acqData.data.map(Object.values);
 
+		// console.log("Data fetched and processed:", data);
 
-		'sPaginationType': 'bootstrap',
-		'bPaginate': false,
-		'bInfo': false,
-		'dom' : 'tr',
-    'ajax' : {
-			url:'https://sheets.googleapis.com/v4/spreadsheets/1Ym_DjK2JNfwv5HeTvF8wVtmOg-TXQZKwzEJg5gJunuA/values/A:M?key=AIzaSyD8Y28YJpVhE4XlVlOoA74Ws47YdPz5nGA',
-			cache: true,
-      'dataSrc': function(json) {
-        var myData = json['values']; //spreadsheet data lives in an array with the name values
-        //rewrite data to an object with key-value pairs. This is also a chance to rename or ignore columns
-        myData= myData.map(function( n, i ) {
-            var myObject = {
-              image:n[11],
-              cite:n[12],
-              subject:n[2],
-              month:n[8],
-              issue:n[9]
-            };
-            return myObject;
-        });
-        myData.splice(0,1); //remove the first row, which contains the orginal column headers
-        return myData;
-      }
-    },
-		'iDisplayLength': 200,
-    'columns': createTableColumns(),
-    'oLanguage': {
-            'sLengthMenu': '_MENU_ records per page'
+		const columns = createTableColumns();
 
-        },
+		var oTable = $('#data-table-container').DataTable({
+			'sPaginationType': 'bootstrap',
+			'bPaginate': false,
+			'bInfo': false,
+			'dom' : 'tr',
+			'data': data,
+			'iDisplayLength': 200,
+			'columns': columns,
+			'oLanguage': {
+				'sLengthMenu': '_MENU_ records per page'
+			},
+			'order': [[ 2, "asc" ],[ 12, "asc" ] ],
+			'initComplete' : function (settings) {
+				var api = this.api();
+				createMenu(api);
+			},
+			'drawCallback': function ( settings ) {
+				var api = this.api();
+				var rows = api.rows( {page:'current'} ).nodes();
+				var last=null;
 
-		'order': [[ 2, "asc" ],[ 1, "asc" ] ],
-    'initComplete' : function (settings) {
-      createMenu();
-    },
+				api.column(2, {page:'current'} ).data().each( function ( group, i ) {
+					var groupKey = $.trim(group || '');
+					if ( last !== group ) {
+						$(rows).eq( i ).before(
+							'<tr class="group" data-group="'+groupKey+'"><td colspan="3"><button type="button" class="group-toggle" data-group="'+groupKey+'" aria-expanded="true"><span class="group-toggle-icon">▾</span> <span class="group-title">'+group+'</span></button></td></tr>'
+						);
 
-		'drawCallback': function ( settings ) {
-           var api = this.api();
-           var rows = api.rows( {page:'current'} ).nodes();
-           var last=null;
+						last = group;
+					}
 
-            api.column(2, {page:'current'} ).data().each( function ( group, i ) {
-                if ( last !== group ) {
-                    $(rows).eq( i ).before(
-                        '<tr class="group"><td colspan="2"><h4>'+group+'</h4></td></tr>'
-                      );
+					$(rows).eq( i ).addClass('group-item').attr('data-group', groupKey);
+				} );
 
-                    last = group;
-                }
-            } );
-        }
-    });
+				$('#data-table-container').find('.group-toggle').off('click').on('click', function () {
+					var groupKey = $(this).data('group');
+					collapsedGroups[groupKey] = collapsedGroups[groupKey] !== true;
+					applyGroupToggleState($('#data-table-container'));
+				});
 
+				applyGroupToggleState($('#data-table-container'));
+			}
+		});
+	}
 
-
-
+	main(acqURL);
 
 });
-
-
-
-
-
-
-
-
-
-
-
-
 
 //define two custom functions (asc and desc) for string sorting
 jQuery.fn.dataTableExt.oSort['string-case-asc']  = function(x,y) {

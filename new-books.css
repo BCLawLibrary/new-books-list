@@ -8,15 +8,17 @@
 }
 
 #months {
-	padding:10px 15px 15px;g
+	padding:10px 15px 1px 10px;
 	background-color:#eee;
+	border-radius:4px;
+	margin-bottom:15px;
 
 }
 
 
 #months span.btn-maroon {
-	margin-right:20px;a
-	margin-bottom:10px;
+	margin-right:20px;
+	margin-bottom:5px;
 }
 
 #months span.highlight-issue {
@@ -27,40 +29,13 @@
 	color:#8A100B;
 }
 
-
-#listData ul.mylist {
-	-webkit-column-count: 4; /* Chrome, Safari, Opera */
-    -moz-column-count: 4; /* Firefox */
-	column-count: 4;
-	list-style:none;
-	padding-left:0px;
-	margin-bottom:0px;
-	background-color: #fff;
-    border-top: 3px solid #B70000;
-    padding: 2px;
-	padding-bottom:10px;
-	box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-	font-size:13px;
+#toggle-all-groups {
+	margin:0 0 15px 10px;
 }
 
-#listData li {
-	padding: 0px 5px;
-	position: relative;
-}
-
-.highlight-li {
-	background-color:#eee;
-}
-
-.highlight-li:after {
-	content: "\e603";
-    font-family: icomoon;
-    color: #ce0303;
-    padding-left: 10px;
-	position:absolute;
-	right:5px;
-}
-a.subjectLink:focus, a.subjectLink:hover, a.all:focus, a.all:hover {
+a.subjectLink:focus, a.subjectLink:hover, a.all:focus, a.all:hover,
+a.allMonthsLink:focus, a.allMonthsLink:hover {
+	color:inherit;
 
 }
 
@@ -76,6 +51,8 @@ a.subjectLink:focus, a.subjectLink:hover, a.all:focus, a.all:hover {
 #newacq table.dataTable, #newacq table.dataTable td {
 	border:0px solid black;
 	background-color:transparent;
+	padding-left:5px;
+	padding-right:35px;
 
 }
 #newacq tr {
@@ -83,17 +60,53 @@ a.subjectLink:focus, a.subjectLink:hover, a.all:focus, a.all:hover {
 }
 
 td.image {
-	width:150px;
+	width:100px;
+	height:auto;
 
+}
+
+td.image img {
+    max-width: 450px;
+    width: 100px;
+    height: auto;
 }
 
 #newacq tr.group {
-	background-color:#899387;
+	background-color:#003957;
 	color:#ffffff;
 	min-height:0px;
+	padding-top:10px;
+}
+
+#newacq button.group-toggle {
+	background-color:#003957;
+	color:#ffffff;
+	min-height:0px;
+	border:0;
+	border-radius:0;
+	box-shadow:none;
+	background-image:none;
+	-webkit-appearance:none;
+	appearance:none;
+	padding:0;
+}
+
+#newacq button.group-toggle .group-toggle-icon {
+	display:inline-block;
+	font-size:1em;
+	line-height:1;
 }
 
 @media (max-width: 700px) {
+	#newacq {
+		overflow-x:auto;
+		-webkit-overflow-scrolling:touch;
+	}
+
+	#newacq table.dataTable {
+		min-width:810px;
+	}
+
 	#listData ul.mylist {
 	-webkit-column-count: 3; /* Chrome, Safari, Opera */
     -moz-column-count: 3; /* Firefox */
